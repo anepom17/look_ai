@@ -27,6 +27,10 @@ COPY --from=builder /app/prompts ./prompts
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Persist saved guides: mount a volume at /app/data in Coolify (or docker run -v)
+RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
+VOLUME ["/app/data"]
+
 USER nextjs
 
 EXPOSE 3000
