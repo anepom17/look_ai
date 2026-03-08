@@ -29,7 +29,7 @@ function getAI(): GoogleGenAI {
 }
 
 function loadPrompt(filename: string): string {
-  const promptsDir = path.join(process.cwd(), "..", "prompts");
+  const promptsDir = path.join(process.cwd(), "prompts");
   const filePath = path.join(promptsDir, filename);
   return fs.readFileSync(filePath, "utf-8");
 }

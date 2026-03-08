@@ -1,0 +1,31 @@
+# Dependencies
+node_modules
+.pnpm-store
+npm-debug.log*
+
+# Build
+.next
+out
+dist
+
+# Env (use Coolify env vars instead)
+.env
+.env.*
+!.env.local.example
+
+# Git / IDE
+.git
+.gitignore
+.cursor
+.vscode
+*.md
+!README.md
+
+# Tests and misc
+e2e
+coverage
+test-results
+playwright-report
+blob-report
+*.spec.ts
+*.spec.tsx
