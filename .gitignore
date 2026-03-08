@@ -23,6 +23,9 @@
 # production
 /build
 
+# local SQLite DB for saved guides
+/data
+
 # misc
 .DS_Store
 *.pem

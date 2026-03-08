@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ProgressBar } from "@/components/wizard/ProgressBar";
 import { Step0Meta } from "@/components/wizard/Step0Meta";
 import { Step1ColorType } from "@/components/wizard/Step1ColorType";
@@ -209,6 +210,26 @@ export default function Home() {
         wardrobe,
       });
 
+      // Auto-save guide to profile so user can access it later without re-calling AI
+      try {
+        await fetch("/api/profile", { method: "POST", credentials: "same-origin" });
+        await fetch("/api/profile/guides", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            meta: state.meta,
+            colorType: state.colorType,
+            profile: state.profile,
+            archetype: state.archetype,
+            wardrobe,
+            guide,
+          }),
+        });
+      } catch {
+        // Guide is still shown; save failure is non-blocking
+      }
+
       setState((s) => ({
         ...s,
         wardrobe: wardrobe as WizardState["wardrobe"],
@@ -283,14 +304,22 @@ export default function Home() {
             </p>
             <p className="text-[10px] text-zinc-300">Персональный гид по стилю</p>
           </div>
-          {state.currentStep > 0 && (
-            <button
-              onClick={() => setState(initialState)}
-              className="text-xs text-zinc-400 hover:text-zinc-600"
+          <div className="flex items-center gap-3">
+            <Link
+              href="/my-guides"
+              className="rounded-lg border-2 border-zinc-300 bg-zinc-100 px-4 py-2 text-sm font-semibold text-zinc-800 shadow-sm transition-colors hover:border-zinc-400 hover:bg-zinc-200 hover:text-zinc-900"
             >
-              Начать заново
-            </button>
-          )}
+              Мои гайды
+            </Link>
+            {state.currentStep > 0 && (
+              <button
+                onClick={() => setState(initialState)}
+                className="text-xs text-zinc-400 hover:text-zinc-600"
+              >
+                Начать заново
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Progress */}
