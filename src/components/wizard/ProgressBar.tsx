@@ -18,19 +18,20 @@ export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
   const percent = Math.round((currentStep / (totalSteps - 1)) * 100);
 
   return (
-    <div className="w-full">
+    <nav className="w-full" aria-label="Прогресс визарда">
       {/* Step labels */}
-      <div className="flex justify-between mb-2">
+      <div className="flex justify-between mb-3 gap-1">
         {STEP_LABELS.slice(0, totalSteps).map((label, i) => (
           <span
             key={i}
-            className={`text-[10px] font-medium tracking-wide uppercase transition-colors ${
+            className={`text-[10px] font-medium tracking-widest uppercase motion-safe:transition-colors duration-300 flex-1 text-center ${
               i === currentStep
-                ? "text-zinc-900"
+                ? "text-[var(--accent-primary)]"
                 : i < currentStep
-                ? "text-zinc-400"
-                : "text-zinc-200"
+                ? "text-[var(--foreground-tertiary)]"
+                : "text-[var(--border-light)]"
             }`}
+            aria-current={i === currentStep ? "step" : undefined}
           >
             {label}
           </span>
@@ -38,20 +39,26 @@ export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
       </div>
 
       {/* Bar */}
-      <div className="relative h-1 bg-zinc-100 rounded-full overflow-hidden">
+      <div className="relative h-1.5 bg-[var(--background-secondary)] rounded-full overflow-hidden">
         <div
-          className="absolute left-0 top-0 h-full bg-zinc-900 rounded-full transition-all duration-500"
+          className="absolute left-0 top-0 h-full bg-[var(--accent-primary)] rounded-full transition-all duration-700 ease-out"
           style={{ width: `${percent}%` }}
+          role="progressbar"
+          aria-valuenow={percent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${percent}% проходимого визарда`}
         />
       </div>
 
       {/* Step counter */}
-      <div className="flex justify-between mt-1.5">
-        <span className="text-[10px] text-zinc-400">
-          Шаг {currentStep + 1} из {totalSteps}
+      <div className="flex justify-between mt-2.5 text-[10px] text-zinc-400">
+        <span>
+          Шаг <span className="font-semibold text-zinc-600">{currentStep + 1}</span> из{" "}
+          <span className="font-semibold text-zinc-600">{totalSteps}</span>
         </span>
-        <span className="text-[10px] text-zinc-400">{percent}%</span>
+        <span className="font-semibold text-zinc-600">{percent}%</span>
       </div>
-    </div>
+    </nav>
   );
 }

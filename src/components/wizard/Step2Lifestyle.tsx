@@ -60,19 +60,23 @@ function ToggleButton({
   selected,
   onClick,
   children,
+  role = "radio",
 }: {
   selected: boolean;
   onClick: () => void;
   children: React.ReactNode;
+  role?: "radio" | "checkbox";
 }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm transition-all ${
+      className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm motion-safe:transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 ${
         selected
           ? "border-zinc-900 bg-zinc-900 text-white"
           : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400"
       }`}
+      aria-pressed={selected}
+      role={role}
     >
       {children}
     </button>
@@ -139,8 +143,8 @@ export function Step2Lifestyle({ colorType, gender, onComplete, isLoading }: Ste
       </div>
 
       {/* Height */}
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-zinc-700">Рост</p>
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium text-zinc-700">Рост</legend>
         <div className="grid grid-cols-2 gap-2">
           {["< 160 см", "160–170 см", "170–180 см", "> 180 см"].map((h) => (
             <ToggleButton key={h} selected={height === h} onClick={() => setHeight(h)}>
@@ -148,11 +152,11 @@ export function Step2Lifestyle({ colorType, gender, onComplete, isLoading }: Ste
             </ToggleButton>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       {/* Body type */}
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-zinc-700">Тип телосложения</p>
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium text-zinc-700">Тип телосложения</legend>
         <div className="grid grid-cols-1 gap-2">
           {bodyTypes.map((b) => (
             <ToggleButton key={b.value} selected={bodyType === b.value} onClick={() => setBodyType(b.value)}>
@@ -160,11 +164,11 @@ export function Step2Lifestyle({ colorType, gender, onComplete, isLoading }: Ste
             </ToggleButton>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       {/* Work */}
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-zinc-700">Место и характер работы</p>
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium text-zinc-700">Место и характер работы</legend>
         <div className="grid grid-cols-1 gap-2">
           {[
             { value: "office_formal", label: "Офис со строгим дресс-кодом" },
@@ -180,11 +184,11 @@ export function Step2Lifestyle({ colorType, gender, onComplete, isLoading }: Ste
             </ToggleButton>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       {/* Dresscode */}
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-zinc-700">Дресс-код на работе</p>
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium text-zinc-700">Дресс-код на работе</legend>
         <div className="grid grid-cols-2 gap-2">
           {[
             { value: "strict", label: "Строгий деловой" },
@@ -201,24 +205,26 @@ export function Step2Lifestyle({ colorType, gender, onComplete, isLoading }: Ste
             </ToggleButton>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       {/* Social contexts */}
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-zinc-700">
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium text-zinc-700">
           Социальные контексты{" "}
           <span className="text-zinc-400 font-normal">(выберите все актуальные)</span>
-        </p>
+        </legend>
         <div className="grid grid-cols-1 gap-2">
           {SOCIAL_CONTEXTS.map((c) => (
             <button
               key={c.value}
               onClick={() => toggleContext(c.value)}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg border text-sm transition-all text-left ${
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg border text-sm motion-safe:transition-all text-left focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 ${
                 socialContexts.includes(c.value)
                   ? "border-zinc-900 bg-zinc-900 text-white"
                   : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400"
               }`}
+              role="checkbox"
+              aria-checked={socialContexts.includes(c.value)}
             >
               <span
                 className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center ${
@@ -243,11 +249,11 @@ export function Step2Lifestyle({ colorType, gender, onComplete, isLoading }: Ste
             </button>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       {/* Mobility */}
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-zinc-700">Как обычно передвигаетесь?</p>
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium text-zinc-700">Как обычно передвигаетесь?</legend>
         <div className="grid grid-cols-3 gap-2">
           {[
             { value: "pedestrian", label: "Пешком" },
@@ -263,11 +269,11 @@ export function Step2Lifestyle({ colorType, gender, onComplete, isLoading }: Ste
             </ToggleButton>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       {/* Style goal */}
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-zinc-700">Что хочется транслировать своим образом?</p>
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium text-zinc-700">Что хочется транслировать своим образом?</legend>
         <div className="grid grid-cols-1 gap-2">
           {STYLE_GOALS.map((g) => (
             <ToggleButton key={g.value} selected={styleGoal === g.value} onClick={() => setStyleGoal(g.value)}>
@@ -275,7 +281,7 @@ export function Step2Lifestyle({ colorType, gender, onComplete, isLoading }: Ste
             </ToggleButton>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       {/* Current wardrobe */}
       <div className="space-y-4">
@@ -285,11 +291,12 @@ export function Step2Lifestyle({ colorType, gender, onComplete, isLoading }: Ste
             <span className="text-zinc-400 font-normal">(опционально)</span>
           </label>
           <textarea
+            id="currentLikes"
             value={currentLikes}
             onChange={(e) => setCurrentLikes(e.target.value)}
             rows={2}
             placeholder="Например: удобные джинсы, хорошие жакеты"
-            className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 text-sm resize-none"
+            className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 text-sm resize-none motion-safe:transition-all"
           />
         </div>
         <div className="space-y-2">
@@ -298,11 +305,12 @@ export function Step2Lifestyle({ colorType, gender, onComplete, isLoading }: Ste
             <span className="text-zinc-400 font-normal">(опционально)</span>
           </label>
           <textarea
+            id="currentDislikes"
             value={currentDislikes}
             onChange={(e) => setCurrentDislikes(e.target.value)}
             rows={2}
             placeholder="Например: слишком много чёрного, нет интересных образов"
-            className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 text-sm resize-none"
+            className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 text-sm resize-none motion-safe:transition-all"
           />
         </div>
       </div>

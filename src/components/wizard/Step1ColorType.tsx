@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/Button";
+import { ErrorAlert } from "@/components/ui/ErrorAlert";
 import type { ColorTypeQuizAnswers, ColorTypePreliminaryResponse } from "@/lib/types";
 
 const MAX_FILE_MB = 8;
@@ -67,25 +68,29 @@ function OptionGroup({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const fieldId = label.replace(/\s+/g, "-").toLowerCase();
+  
   return (
-    <div className="space-y-2">
-      <p className="text-sm font-medium text-zinc-700">{label}</p>
-      <div className="grid grid-cols-1 gap-2">
+    <fieldset className="space-y-2">
+      <legend className="text-sm font-medium text-zinc-700">{label}</legend>
+      <div className="grid grid-cols-1 gap-2" role="group" aria-labelledby={fieldId}>
         {options.map((o) => (
           <button
             key={o.value}
             onClick={() => onChange(o.value)}
-            className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm transition-all ${
+            className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm motion-safe:transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 ${
               value === o.value
                 ? "border-zinc-900 bg-zinc-900 text-white"
                 : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400"
             }`}
+            aria-pressed={value === o.value}
+            role="radio"
           >
             {o.label}
           </button>
         ))}
       </div>
-    </div>
+    </fieldset>
   );
 }
 
@@ -201,7 +206,15 @@ export function Step1ColorType({ colorTypePreliminary, onComplete, onPhotoSubmit
             {wristFile && <p className="text-xs text-zinc-500">Выбран файл: {wristFile.name}</p>}
           </div>
         )}
-        {uploadError && <p className="text-sm text-red-600">{uploadError}</p>}
+        {uploadError && (
+          <ErrorAlert
+            message="Ошибка при загрузке файла"
+            details={uploadError}
+            variant="error"
+            onDismiss={() => setUploadError(null)}
+            showDismiss={true}
+          />
+        )}
         <div className="flex flex-col gap-3 pt-2">
           <Button
             onClick={handlePhotoSubmit}
@@ -250,10 +263,10 @@ export function Step1ColorType({ colorTypePreliminary, onComplete, onPhotoSubmit
       />
 
       {/* Jewelry */}
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-zinc-700">
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium text-zinc-700">
           3. Какие украшения лучше смотрятся у лица?
-        </p>
+        </legend>
         <div className="grid grid-cols-2 gap-3">
           {[
             { value: "silver", label: "Серебро / белое золото" },
@@ -262,17 +275,19 @@ export function Step1ColorType({ colorTypePreliminary, onComplete, onPhotoSubmit
             <button
               key={o.value}
               onClick={() => setJewelry(o.value as "silver" | "gold")}
-              className={`px-4 py-3 rounded-lg border text-sm font-medium transition-all ${
+              className={`px-4 py-3 rounded-lg border text-sm font-medium motion-safe:transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 ${
                 jewelry === o.value
                   ? "border-zinc-900 bg-zinc-900 text-white"
                   : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400"
               }`}
+              aria-pressed={jewelry === o.value}
+              role="radio"
             >
               {o.label}
             </button>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       <OptionGroup
         label="4. Как вы загораете?"

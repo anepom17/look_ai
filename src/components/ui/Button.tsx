@@ -3,7 +3,7 @@
 import { ButtonHTMLAttributes } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
 }
@@ -18,28 +18,35 @@ export function Button({
   ...props
 }: ButtonProps) {
   const base =
-    "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
+    "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus-ring";
 
   const variants = {
     primary:
-      "bg-zinc-900 text-white hover:bg-zinc-700 focus:ring-zinc-900 disabled:bg-zinc-300",
+      "bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary-dark)] hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 disabled:bg-[var(--accent-primary-light)] disabled:opacity-50 disabled:shadow-none disabled:hover:shadow-none disabled:cursor-not-allowed disabled:hover:-translate-y-0 motion-safe:transition-all",
     secondary:
-      "bg-white text-zinc-900 border border-zinc-200 hover:bg-zinc-50 focus:ring-zinc-400",
+      "bg-white text-[var(--foreground)] border border-[var(--border-light)] hover:bg-[var(--background-secondary)] hover:border-[var(--border-medium)] active:bg-[var(--background)] disabled:bg-[var(--background-light)] disabled:border-[var(--border-light)] disabled:text-[var(--foreground-tertiary)] disabled:cursor-not-allowed motion-safe:transition-all",
     ghost:
-      "bg-transparent text-zinc-600 hover:bg-zinc-100 focus:ring-zinc-400",
+      "bg-transparent text-[var(--foreground-secondary)] hover:bg-[var(--background-secondary)] active:bg-[var(--background)] disabled:text-[var(--foreground-tertiary)] disabled:cursor-not-allowed motion-safe:transition-all",
+    danger:
+      "bg-[var(--error)] text-white hover:opacity-90 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:shadow-none disabled:hover:shadow-none disabled:hover:-translate-y-0 motion-safe:transition-all",
   };
 
   const sizes = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-5 py-2.5 text-sm",
-    lg: "px-7 py-3.5 text-base",
+    sm: "px-3 py-1.5 text-sm min-h-[32px]",
+    md: "px-5 py-2.5 text-sm min-h-[40px]",
+    lg: "px-7 py-3.5 text-base min-h-[48px] md:min-h-[44px]",
   };
+
+  const isDisabled = disabled || loading;
 
   return (
     <button
       {...props}
-      disabled={disabled || loading}
-      className={`${base} ${variants[variant]} ${sizes[size]} ${loading ? "opacity-70 cursor-not-allowed" : ""} ${className}`}
+      disabled={isDisabled}
+      className={`${base} ${variants[variant]} ${sizes[size]} ${
+        loading ? "opacity-70" : ""
+      } ${className}`}
+      aria-busy={loading}
     >
       {loading && (
         <svg
@@ -47,6 +54,7 @@ export function Button({
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <circle
             className="opacity-25"

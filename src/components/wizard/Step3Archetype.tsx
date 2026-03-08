@@ -61,11 +61,13 @@ export function Step3Archetype({ recommendations, onComplete, isLoading }: Step3
                 setPrimary(rec.archetypeId);
                 if (secondary === rec.archetypeId) setSecondary(null);
               }}
-              className={`w-full text-left rounded-2xl border-2 p-5 transition-all ${
+              className={`w-full text-left rounded-2xl border-2 p-5 motion-safe:transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 ${
                 isSelected
                   ? "border-zinc-900 bg-zinc-900 text-white"
                   : "border-zinc-200 bg-white hover:border-zinc-400"
               }`}
+              role="radio"
+              aria-checked={isSelected}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
@@ -130,11 +132,13 @@ export function Step3Archetype({ recommendations, onComplete, isLoading }: Step3
                   <button
                     key={id}
                     onClick={() => setSecondary(isSelected ? null : id)}
-                    className={`px-4 py-3 rounded-xl border text-left transition-all ${
+                    className={`px-4 py-3 rounded-xl border text-left motion-safe:transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 ${
                       isSelected
                         ? "border-zinc-900 bg-zinc-900 text-white"
                         : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400"
                     }`}
+                    role="checkbox"
+                    aria-checked={isSelected}
                   >
                     <p className="text-xs font-medium">{a.nameRu}</p>
                     <p className={`text-[10px] mt-0.5 ${isSelected ? "text-zinc-300" : "text-zinc-400"}`}>

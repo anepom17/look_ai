@@ -7,6 +7,8 @@ import { Step1ColorType } from "@/components/wizard/Step1ColorType";
 import { Step2Lifestyle } from "@/components/wizard/Step2Lifestyle";
 import { Step3Archetype } from "@/components/wizard/Step3Archetype";
 import { Step4Results } from "@/components/wizard/Step4Results";
+import { Step4Loading } from "@/components/wizard/Step4Loading";
+import { ErrorAlert } from "@/components/ui/ErrorAlert";
 import type {
   WizardState,
   MetaInput,
@@ -300,53 +302,61 @@ export default function Home() {
 
         {/* Error */}
         {state.error && (
-          <div className="mb-6 rounded-xl bg-red-50 border border-red-100 px-4 py-3">
-            <p className="text-sm text-red-600">{state.error}</p>
+          <div className="mb-6">
+            <ErrorAlert
+              message="Что-то пошло не так"
+              details={state.error}
+              variant="error"
+              onDismiss={() => setState((s) => ({ ...s, error: null }))}
+              showDismiss={true}
+            />
           </div>
         )}
 
         {/* Steps */}
         {state.currentStep === 0 && (
-          <Step0Meta onComplete={handleMetaComplete} />
+          <div className="scale-in">
+            <Step0Meta onComplete={handleMetaComplete} />
+          </div>
         )}
 
         {state.currentStep === 1 && (
-          <Step1ColorType
-            colorTypePreliminary={state.colorTypePreliminary}
-            onComplete={handleColorTypeComplete}
-            onPhotoSubmit={handleColorTypePhotoSubmit}
-            onSkip={handleColorTypeSkip}
-            isLoading={state.isLoading}
-          />
+          <div className="scale-in">
+            <Step1ColorType
+              colorTypePreliminary={state.colorTypePreliminary}
+              onComplete={handleColorTypeComplete}
+              onPhotoSubmit={handleColorTypePhotoSubmit}
+              onSkip={handleColorTypeSkip}
+              isLoading={state.isLoading}
+            />
+          </div>
         )}
 
         {state.currentStep === 2 && state.colorType && state.meta && (
-          <Step2Lifestyle
-            colorType={state.colorType}
-            gender={state.meta.gender}
-            onComplete={handleLifestyleComplete}
-            isLoading={state.isLoading}
-          />
+          <div className="scale-in">
+            <Step2Lifestyle
+              colorType={state.colorType}
+              gender={state.meta.gender}
+              onComplete={handleLifestyleComplete}
+              isLoading={state.isLoading}
+            />
+          </div>
         )}
 
         {state.currentStep === 3 && state.archetypeRecommendations && (
-          <Step3Archetype
-            recommendations={state.archetypeRecommendations}
-            onComplete={handleArchetypeComplete}
-            isLoading={state.isLoading}
-          />
+          <div className="scale-in">
+            <Step3Archetype
+              recommendations={state.archetypeRecommendations}
+              onComplete={handleArchetypeComplete}
+              isLoading={state.isLoading}
+            />
+          </div>
         )}
 
         {/* Step 4: building wardrobe */}
         {state.currentStep === 4 && (state.isLoading || !state.wardrobe) && (
-          <div className="flex flex-col items-center justify-center py-24 space-y-6">
-            <div className="w-12 h-12 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin" />
-            <div className="text-center">
-              <p className="font-semibold text-zinc-900">Создаём ваш гардероб</p>
-              <p className="text-sm text-zinc-400 mt-1">
-                Подбираем вещи, формулы образов и референсы...
-              </p>
-            </div>
+          <div className="scale-in">
+            <Step4Loading totalDuration={240} />
           </div>
         )}
 
@@ -358,16 +368,18 @@ export default function Home() {
           state.archetype &&
           state.wardrobe &&
           state.guide && (
-            <Step4Results
-              meta={state.meta}
-              colorType={state.colorType}
-              profile={state.profile}
-              archetype={state.archetype}
-              wardrobe={state.wardrobe}
-              guide={state.guide}
-              isGeneratingPDF={isGeneratingPDF}
-              onDownloadPDF={handleDownloadPDF}
-            />
+            <div className="scale-in">
+              <Step4Results
+                meta={state.meta}
+                colorType={state.colorType}
+                profile={state.profile}
+                archetype={state.archetype}
+                wardrobe={state.wardrobe}
+                guide={state.guide}
+                isGeneratingPDF={isGeneratingPDF}
+                onDownloadPDF={handleDownloadPDF}
+              />
+            </div>
           )}
 
         {/* Landing — step 0 decoration */}

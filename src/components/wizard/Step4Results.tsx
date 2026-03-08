@@ -46,7 +46,7 @@ export function Step4Results({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 fade-in">
       {/* Header */}
       <div>
         <p className="text-xs text-zinc-400 uppercase tracking-widest mb-1">Готово</p>
@@ -273,15 +273,29 @@ export function Step4Results({
               </p>
               <div className="space-y-3">
                 {guide.references.map((ref, i) => (
-                  <div key={i} className="rounded-xl border border-zinc-100 bg-white p-4">
-                    <p className="font-semibold text-zinc-900 text-sm">{ref.name}</p>
-                    <p className="text-xs text-zinc-400 mb-2">{ref.profession}</p>
-                    <p className="text-xs text-zinc-600 mb-1">{ref.styleSimilarity}</p>
-                    {ref.whatToAdopt.map((item, j) => (
-                      <p key={j} className="text-xs text-zinc-500 ml-3">
-                        → {item}
-                      </p>
-                    ))}
+                  <div
+                    key={i}
+                    className="rounded-xl border border-zinc-100 bg-white p-4 flex gap-3"
+                  >
+                    {ref.imageUrl && (
+                      <div className="w-28 h-36 shrink-0 rounded-lg overflow-hidden bg-zinc-100 flex items-center justify-center">
+                        <img
+                          src={ref.imageUrl}
+                          alt={ref.name}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-zinc-900 text-sm">{ref.name}</p>
+                      <p className="text-xs text-zinc-400 mb-2">{ref.profession}</p>
+                      <p className="text-xs text-zinc-600 mb-1">{ref.styleSimilarity}</p>
+                      {ref.whatToAdopt.map((item, j) => (
+                        <p key={j} className="text-xs text-zinc-500 ml-3">
+                          → {item}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>

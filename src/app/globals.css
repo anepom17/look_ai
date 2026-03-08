@@ -1,8 +1,45 @@
 @import "tailwindcss";
 
+/* ──── Color Palette: Warm Elegant Premium Fashion ──── */
 :root {
-  --background: #F8F7F4;
-  --foreground: #1C1C1E;
+  /* Backgrounds & Neutrals */
+  --background: #EDEAE0;
+  --background-light: #FCFBFA;
+  --background-secondary: #F6F4EF;
+  --foreground: #3B3C36;
+  --foreground-secondary: #615838;
+  --foreground-tertiary: #928354;
+
+  /* Primary Accent - Golden Apricot */
+  --accent-primary: #E09540;
+  --accent-primary-light: #EFCA9F;
+  --accent-primary-dark: #CD7D21;
+
+  /* Secondary Accent - Velvet Purple */
+  --accent-secondary: #683068;
+  --accent-secondary-light: #924392;
+  --accent-secondary-dark: #4D2057;
+
+  /* Tertiary Accent - Golden Bronze */
+  --accent-tertiary: #CBA135;
+  --accent-tertiary-light: #DCC078;
+  --accent-tertiary-dark: #A9852C;
+
+  /* Status Colors */
+  --success: #4CAF50;
+  --warning: #FF9800;
+  --error: #660000;
+  --info: #536878;
+
+  /* Border & Dividers */
+  --border-light: #D0C8AE;
+  --border-medium: #B5A87D;
+
+  /* Safe Area Insets */
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 body {
@@ -15,5 +52,143 @@ body {
 /* Smooth scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  scrollbar-color: var(--border-medium) transparent;
+}
+
+/* ──── Animations ──── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes progressPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Custom utilities for animations */
+@utility fade-in {
+  animation: fadeIn 250ms ease-out forwards;
+}
+
+@utility fade-out {
+  animation: fadeOut 150ms ease-in forwards;
+}
+
+@utility scale-in {
+  animation: scaleIn 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@utility slide-up {
+  animation: slideUp 300ms ease-out forwards;
+}
+
+@utility pulse-progress {
+  animation: progressPulse 2s infinite;
+}
+
+/* Motion preferences */
+@supports (animation: none) {
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Safe area padding for notches */
+@layer components {
+  .px-safe {
+    padding-left: calc(1rem + var(--safe-area-inset-left));
+    padding-right: calc(1rem + var(--safe-area-inset-right));
+  }
+
+  .pt-safe {
+    padding-top: calc(2rem + var(--safe-area-inset-top));
+  }
+
+  .pb-safe {
+    padding-bottom: calc(2rem + var(--safe-area-inset-bottom));
+  }
+
+  /* Motion-safe and motion-reduce utilities */
+  @media (prefers-reduced-motion: no-preference) {
+    .motion-safe\:transition-all {
+      @apply transition-all;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .motion-reduce\:transition-none {
+      transition: none !important;
+    }
+    .motion-reduce\:animate-none {
+      animation: none !important;
+    }
+  }
+
+  /* Card styling with warm palette */
+  .card-warm {
+    @apply bg-white rounded-xl border border-zinc-200 shadow-sm hover:shadow-md motion-safe:transition-shadow;
+  }
+
+  /* Button base styles using CSS variables */
+  .btn-accent-primary {
+    background-color: var(--accent-primary);
+    color: white;
+  }
+
+  .btn-accent-primary:hover {
+    background-color: var(--accent-primary-dark);
+  }
+
+  .btn-accent-secondary {
+    background-color: var(--accent-secondary);
+    color: white;
+  }
+
+  .btn-accent-secondary:hover {
+    background-color: var(--accent-secondary-dark);
+  }
 }

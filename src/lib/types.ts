@@ -187,6 +187,8 @@ export interface Reference {
   colorTypeSimilarity: string;
   styleSimilarity: string;
   whatToAdopt: string[];
+  /** Optional image URL for the reference (e.g. from SerpApi Google Images). */
+  imageUrl?: string;
 }
 
 export interface PersonalRule {

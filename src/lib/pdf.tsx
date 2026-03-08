@@ -1,5 +1,4 @@
 import React from "react";
-import path from "path";
 import {
   Document,
   Page,
@@ -21,17 +20,35 @@ import type {
   CapsuleItem,
 } from "./types";
 
-// ─── Font registration ────────────────────────────────────────────────────────
+// ─── Font registration (URL — Cyrillic support) ───────────────────────────────
 
-const fontsDir = path.join(process.cwd(), "public", "fonts");
+// WOFF (not WOFF2) — react-pdf server-side often fails on WOFF2, falls back to font without Cyrillic → garbled symbols
+const ROBOTO_BASE =
+  "https://cdn.jsdelivr.net/npm/@fontsource/roboto@5.2.10/files";
 
 Font.register({
   family: "Roboto",
   fonts: [
-    { src: path.join(fontsDir, "Roboto-Regular.ttf"),    fontWeight: "normal", fontStyle: "normal" },
-    { src: path.join(fontsDir, "Roboto-Bold.ttf"),       fontWeight: "bold",   fontStyle: "normal" },
-    { src: path.join(fontsDir, "Roboto-Italic.ttf"),     fontWeight: "normal", fontStyle: "italic" },
-    { src: path.join(fontsDir, "Roboto-BoldItalic.ttf"), fontWeight: "bold",   fontStyle: "italic" },
+    {
+      src: `${ROBOTO_BASE}/roboto-cyrillic-400-normal.woff`,
+      fontWeight: "normal",
+      fontStyle: "normal",
+    },
+    {
+      src: `${ROBOTO_BASE}/roboto-cyrillic-700-normal.woff`,
+      fontWeight: "bold",
+      fontStyle: "normal",
+    },
+    {
+      src: `${ROBOTO_BASE}/roboto-cyrillic-400-italic.woff`,
+      fontWeight: "normal",
+      fontStyle: "italic",
+    },
+    {
+      src: `${ROBOTO_BASE}/roboto-cyrillic-700-italic.woff`,
+      fontWeight: "bold",
+      fontStyle: "italic",
+    },
   ],
 });
 
@@ -48,7 +65,7 @@ const styles = StyleSheet.create({
     padding: 60,
     display: "flex",
     flexDirection: "column",
-    justifyContent: "flex-end",
+    justifyContent: "center",
   },
   coverTitle: {
     fontSize: 36,
@@ -59,6 +76,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   coverSubtitle: {
+    fontFamily: "Roboto",
     fontSize: 13,
     color: "#A0A0A0",
     letterSpacing: 3,
@@ -66,6 +84,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   coverTag: {
+    fontFamily: "Roboto",
     fontSize: 11,
     color: "#F8F7F4",
     marginBottom: 4,
@@ -95,6 +114,21 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
     marginBottom: 20,
+  },
+  /** Subsection title on combined palette page */
+  paletteSectionTitle: {
+    fontFamily: "Roboto",
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#1C1C1E",
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  swatchRowCompact: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 12,
   },
   swatchBlock: {
     width: 70,
@@ -205,6 +239,19 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 14,
     marginBottom: 10,
+  },
+  referenceCardRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  referenceCardText: {
+    flex: 1,
+  },
+  referenceImage: {
+    width: 90,
+    height: 120,
+    borderRadius: 6,
+    objectFit: "contain",
   },
   referenceName: {
     fontSize: 14,
@@ -388,6 +435,50 @@ const PalettePage = ({
   </Page>
 );
 
+/** All three palette sections (neutral, accents, avoid) on one page */
+const PaletteSinglePage = ({
+  colorType,
+  pageNum,
+}: {
+  colorType: ColorTypeResult;
+  pageNum: number;
+}) => {
+  const { palette } = colorType;
+  return (
+    <Page size="A4" style={styles.page}>
+      <Text style={styles.sectionLabel}>Цветовая палитра</Text>
+      <Text style={styles.pageTitle}>Палитра цветотипа</Text>
+      <View style={styles.divider} />
+
+      <Text style={styles.paletteSectionTitle}>Базовые нейтральные цвета</Text>
+      <View style={styles.swatchRowCompact}>
+        {palette.neutral.map((c, i) => (
+          <Swatch key={`n-${pageNum}-${i}-${c.hex ?? ""}`} color={c} />
+        ))}
+      </View>
+
+      <Text style={styles.paletteSectionTitle}>Основные цветовые акценты</Text>
+      <View style={styles.swatchRowCompact}>
+        {palette.best.map((c, i) => (
+          <Swatch key={`b-${pageNum}-${i}-${c.hex ?? ""}`} color={c} />
+        ))}
+      </View>
+
+      <Text style={styles.paletteSectionTitle}>Чего избегать</Text>
+      <View style={styles.swatchRowCompact}>
+        {palette.avoid.map((c, i) => (
+          <Swatch key={`a-${pageNum}-${i}-${c.hex ?? ""}`} color={c} />
+        ))}
+      </View>
+      <Text style={styles.avoidNote}>
+        Эти оттенки могут делать внешность тусклой или подчёркивать недостатки кожи.
+      </Text>
+
+      <PageNum n={pageNum} />
+    </Page>
+  );
+};
+
 const CapsulePage = ({
   items,
   pageNum,
@@ -510,17 +601,38 @@ const ReferencesPage = ({
     <View style={styles.divider} />
     {guide.references.map((ref, i) => (
       <View key={i} style={styles.referenceCard}>
-        <Text style={styles.referenceName}>{ref.name}</Text>
-        <Text style={styles.referenceProfession}>{ref.profession}</Text>
-        <Text style={styles.referenceWhy}>
-          Цветотип: {ref.colorTypeSimilarity}
-        </Text>
-        <Text style={styles.referenceWhy}>Стиль: {ref.styleSimilarity}</Text>
-        {ref.whatToAdopt.map((item, j) => (
-          <Text key={j} style={styles.adoptItem}>
-            → {item}
-          </Text>
-        ))}
+        {ref.imageUrl ? (
+          <View style={styles.referenceCardRow}>
+            <Image src={ref.imageUrl} style={styles.referenceImage} />
+            <View style={styles.referenceCardText}>
+              <Text style={styles.referenceName}>{ref.name}</Text>
+              <Text style={styles.referenceProfession}>{ref.profession}</Text>
+              <Text style={styles.referenceWhy}>
+                Цветотип: {ref.colorTypeSimilarity}
+              </Text>
+              <Text style={styles.referenceWhy}>Стиль: {ref.styleSimilarity}</Text>
+              {ref.whatToAdopt.map((item, j) => (
+                <Text key={j} style={styles.adoptItem}>
+                  → {item}
+                </Text>
+              ))}
+            </View>
+          </View>
+        ) : (
+          <>
+            <Text style={styles.referenceName}>{ref.name}</Text>
+            <Text style={styles.referenceProfession}>{ref.profession}</Text>
+            <Text style={styles.referenceWhy}>
+              Цветотип: {ref.colorTypeSimilarity}
+            </Text>
+            <Text style={styles.referenceWhy}>Стиль: {ref.styleSimilarity}</Text>
+            {ref.whatToAdopt.map((item, j) => (
+              <Text key={j} style={styles.adoptItem}>
+                → {item}
+              </Text>
+            ))}
+          </>
+        )}
       </View>
     ))}
     <PageNum n={pageNum} />
@@ -590,42 +702,30 @@ export const StyleGuidePDF = ({
       {/* 2. Color Type */}
       <ColorTypePage key="colortype" colorType={colorType} />
 
-      {/* 3. Palette — Best */}
-      <PalettePage
-        key="palette-neutral"
-        palette={colorType.palette}
-        title="Базовые нейтральные цвета"
-        colors={colorType.palette.neutral}
-        pageNum={p()}
-      />
+      {/* 3. Palette — all three sections on one page */}
+      <PaletteSinglePage key="palette" colorType={colorType} pageNum={p()} />
 
-      {/* 4. Palette — Accents */}
-      <PalettePage
-        key="palette-best"
-        palette={colorType.palette}
-        title="Основные цветовые акценты"
-        colors={colorType.palette.best}
-        pageNum={p()}
-      />
+      {/* 4–5. Capsule wardrobe — only render when there are items (avoid blank pages) */}
+      {capsuleHalf1.length > 0 && (
+        <CapsulePage key="capsule-1" items={capsuleHalf1} pageNum={p()} />
+      )}
+      {capsuleHalf2.length > 0 && (
+        <CapsulePage key="capsule-2" items={capsuleHalf2} pageNum={p()} />
+      )}
 
-      {/* 5. Palette — Avoid */}
-      <PalettePage
-        key="palette-avoid"
-        palette={colorType.palette}
-        title="Чего избегать"
-        colors={colorType.palette.avoid}
-        note="Эти оттенки могут делать внешность тусклой или подчёркивать недостатки кожи."
-        pageNum={p()}
-      />
-
-      {/* 6–7. Capsule wardrobe */}
-      <CapsulePage key="capsule-1" items={capsuleHalf1} pageNum={p()} />
-      {capsuleHalf2.length > 0 && <CapsulePage key="capsule-2" items={capsuleHalf2} pageNum={p()} />}
-
-      {/* 8–14. Outfits */}
-      {outfits.map((outfit, i) => (
-        <OutfitPage key={`outfit-${i}-${outfit.context}`} outfit={outfit} pageNum={p()} />
-      ))}
+      {/* 8–14. Outfits — skip outfits with no meaningful content to avoid blank pages */}
+      {outfits
+        .filter(
+          (outfit) =>
+            outfit.imageDataUrl || (outfit.headline && outfit.headline.trim() !== "")
+        )
+        .map((outfit, i) => (
+          <OutfitPage
+            key={`outfit-${i}-${outfit.context}`}
+            outfit={outfit}
+            pageNum={p()}
+          />
+        ))}
 
       {/* 15. Archetype */}
       <ArchetypePage key="archetype" archetype={archetype} pageNum={p()} />
