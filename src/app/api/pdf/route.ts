@@ -36,8 +36,9 @@ export async function POST(req: NextRequest) {
       guide,
     }) as unknown as ReactElement<DocumentProps, JSXElementConstructor<DocumentProps>>;
 
-    const buffer = (await renderToBuffer(element)) as Buffer;
-    const uint8 = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+    const buffer = await renderToBuffer(element);
+    const uint8: Uint8Array =
+      buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer as ArrayBuffer);
 
     const filename = meta.name
       ? `guide-${meta.name.toLowerCase().replace(/\s+/g, "-")}.pdf`
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
     const encodedFilename = encodeURIComponent(filename);
     const contentDisposition = `attachment; filename="${asciiFilename}"; filename*=UTF-8''${encodedFilename}`;
 
-    return new NextResponse(uint8, {
+    return new NextResponse(uint8 as BodyInit, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",

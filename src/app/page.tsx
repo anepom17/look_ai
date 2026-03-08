@@ -11,6 +11,7 @@ import type {
   WizardState,
   MetaInput,
   ColorTypeQuizAnswers,
+  ColorTypePreliminaryResponse,
   LifestyleAnswers,
   ArchetypeId,
 } from "@/lib/types";
@@ -72,7 +73,7 @@ export default function Home() {
     if (!state.meta) return;
     setLoading(true);
     try {
-      const res = await apiPost<{ preliminaryResult: WizardState["colorType"]; photoRequest: { selfieInstruction: string; needWristJewelryPhoto: boolean; wristInstruction?: string } }>("colortype", {
+      const res = await apiPost<ColorTypePreliminaryResponse>("colortype", {
         answers,
         gender: state.meta.gender,
       });
