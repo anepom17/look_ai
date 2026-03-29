@@ -10,6 +10,7 @@ import { Step3Archetype } from "@/components/wizard/Step3Archetype";
 import { Step4Results } from "@/components/wizard/Step4Results";
 import { Step4Loading } from "@/components/wizard/Step4Loading";
 import { ErrorAlert } from "@/components/ui/ErrorAlert";
+import { stripWardrobeImageDataUrls } from "@/lib/wardrobe-strip";
 import type {
   WizardState,
   MetaInput,
@@ -17,6 +18,7 @@ import type {
   ColorTypePreliminaryResponse,
   LifestyleAnswers,
   ArchetypeId,
+  WardrobeResult,
 } from "@/lib/types";
 
 const TOTAL_STEPS = 6;
@@ -202,18 +204,20 @@ export default function Home() {
         archetype: state.archetype,
       });
 
+      const wardrobeTyped = wardrobe as WardrobeResult;
+      const wardrobeForTextApis = stripWardrobeImageDataUrls(wardrobeTyped);
       const guide = await apiPost("guide", {
         meta: state.meta,
         colorType: state.colorType,
         profile: state.profile,
         archetype: state.archetype,
-        wardrobe,
+        wardrobe: wardrobeForTextApis,
       });
 
       // Auto-save guide to profile so user can access it later without re-calling AI
       try {
         await fetch("/api/profile", { method: "POST", credentials: "same-origin" });
-        await fetch("/api/profile/guides", {
+        const saveRes = await fetch("/api/profile/guides", {
           method: "POST",
           credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
@@ -222,17 +226,21 @@ export default function Home() {
             colorType: state.colorType,
             profile: state.profile,
             archetype: state.archetype,
-            wardrobe,
+            wardrobe: wardrobeTyped,
             guide,
           }),
         });
+        if (!saveRes.ok && saveRes.status === 403) {
+          const data = await saveRes.json().catch(() => ({}));
+          if (data.message) setError(data.message);
+        }
       } catch {
         // Guide is still shown; save failure is non-blocking
       }
 
       setState((s) => ({
         ...s,
-        wardrobe: wardrobe as WizardState["wardrobe"],
+        wardrobe: wardrobeTyped,
         guide: guide as WizardState["guide"],
         isLoading: false,
         currentStep: 5,
@@ -313,7 +321,10 @@ export default function Home() {
             </Link>
             {state.currentStep > 0 && (
               <button
-                onClick={() => setState(initialState)}
+                onClick={() => {
+                  setState(initialState);
+                  setWardrobeBuildTriggered(false);
+                }}
                 className="text-xs text-zinc-400 hover:text-zinc-600"
               >
                 Начать заново

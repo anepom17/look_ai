@@ -5,13 +5,6 @@ import type { WardrobeResult, GuideResult } from "@/lib/types";
 
 const COOKIE_NAME = "LOOKAI_PROFILE_ID";
 
-function stripWardrobeImageDataUrl(wardrobe: WardrobeResult): WardrobeResult {
-  return {
-    ...wardrobe,
-    outfits: wardrobe.outfits.map(({ imageDataUrl: _, ...outfit }) => outfit),
-  };
-}
-
 export async function GET() {
   try {
     const cookieStore = await cookies();
@@ -41,6 +34,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid profile" }, { status: 401 });
     }
 
+    const existing = getGuidesByProfileId(profileId);
+    if (existing.length >= 2) {
+      return NextResponse.json(
+        {
+          error: "Guide limit reached",
+          message:
+            "Вы уже сохранили максимум 2 гайда для этого профиля. Напишите разработчику, если нужен больший лимит.",
+        },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const { meta, colorType, profile, archetype, wardrobe, guide } = body as {
       meta: { name?: string | null };
@@ -54,13 +59,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const wardrobeStripped = stripWardrobeImageDataUrl(wardrobe);
     const payload = JSON.stringify({
       meta,
       colorType,
       profile,
       archetype,
-      wardrobe: wardrobeStripped,
+      wardrobe,
       guide,
     });
     const title = guide.guideTitle || (meta.name ? `Гид — ${meta.name}` : "Гид по стилю");

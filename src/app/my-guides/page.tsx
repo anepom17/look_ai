@@ -58,7 +58,10 @@ export default function MyGuidesPage() {
           </Link>
         </div>
 
-        <h1 className="text-xl font-bold text-zinc-900 mb-6">Мои гайды</h1>
+        <h1 className="text-xl font-bold text-zinc-900 mb-2">Мои гайды</h1>
+        <p className="text-sm text-zinc-500 mb-6">
+          Вы можете хранить до 2 гайдов для этого браузера. Для увеличения лимита напишите разработчику.
+        </p>
 
         {loading ? (
           <p className="text-sm text-zinc-500">Загрузка…</p>
